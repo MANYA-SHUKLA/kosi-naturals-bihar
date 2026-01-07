@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
 
     // Email to business (notification)
     const businessMailOptions = {
-      from: gmailUser,
+      from: `Kosi Naturals <info@kosinaturals.com>`,
+      replyTo: 'info@kosinaturals.com',
       to: businessEmail,
       subject: `New Newsletter Subscription: ${email}`,
       html: `
@@ -61,7 +62,8 @@ export async function POST(request: NextRequest) {
 
     // Email to user (welcome/confirmation)
     const userMailOptions = {
-      from: gmailUser,
+      from: `Kosi Naturals <info@kosinaturals.com>`,
+      replyTo: 'info@kosinaturals.com',
       to: email,
       subject: `Welcome to Kosi Naturals Newsletter!`,
       html: `
@@ -81,26 +83,63 @@ export async function POST(request: NextRequest) {
           <p>We're committed to bringing you honest food from the heart of Bihar, and we're glad to have you on this journey with us.</p>
           <p>Best regards,<br>The Kosi Naturals Team</p>
           <hr style="border: none; border-top: 1px solid #e8d9c1; margin: 30px 0;">
-          <p style="color: #666; font-size: 12px;">Kosi Region, Bihar, India<br>Email: ${businessEmail}</p>
+          <p style="color: #666; font-size: 12px;">Kosi Region, Bihar, India<br>Email: info@kosinaturals.com</p>
           <p style="color: #999; font-size: 11px; margin-top: 20px;">If you did not subscribe to this newsletter, please ignore this email.</p>
         </div>
       `,
     };
 
-    // Send both emails
-    await Promise.all([
+    // Send both emails independently
+    // This ensures if one fails, the other can still succeed
+    const emailResults = await Promise.allSettled([
       transporter.sendMail(businessMailOptions),
       transporter.sendMail(userMailOptions),
     ]);
+
+    const businessEmailResult = emailResults[0];
+    const userEmailResult = emailResults[1];
+
+    // Log results for debugging
+    if (businessEmailResult.status === 'fulfilled') {
+      console.log('Business notification email sent successfully');
+    } else {
+      console.error('Failed to send business notification email:', businessEmailResult.reason);
+    }
+
+    if (userEmailResult.status === 'fulfilled') {
+      console.log('User confirmation email sent successfully');
+    } else {
+      console.error('Failed to send user confirmation email:', userEmailResult.reason);
+    }
+
+    // If both emails failed, return error
+    if (businessEmailResult.status === 'rejected' && userEmailResult.status === 'rejected') {
+      return NextResponse.json(
+        { error: 'Failed to send emails. Please try again later.' },
+        { status: 500 }
+      );
+    }
+
+    // If at least one email succeeded, consider it a success
+    // (User email is more critical, so we check that first)
+    if (userEmailResult.status === 'rejected') {
+      console.warn('User confirmation email failed, but business notification was sent');
+      // Still return success since subscription was processed
+    }
+
+    if (businessEmailResult.status === 'rejected') {
+      console.warn('Business notification email failed, but user confirmation was sent');
+      // Still return success since user got their confirmation
+    }
 
     return NextResponse.json(
       { message: 'Newsletter subscription successful' },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error sending newsletter email:', error);
+    console.error('Error processing newsletter subscription:', error);
     return NextResponse.json(
-      { error: 'Failed to process subscription' },
+      { error: 'Failed to process subscription. Please try again later.' },
       { status: 500 }
     );
   }
