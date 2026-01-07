@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #fef7ed;
+  --color-primary-100: #fdeed5;
+  --color-primary-200: #fbd9aa;
+  --color-primary-300: #f8be74;
+  --color-primary-400: #f49a3c;
+  --color-primary-500: #f17a16;
+  --color-primary-600: #e25f0c;
+  --color-primary-700: #bb480b;
+  --color-primary-800: #953910;
+  --color-primary-900: #783110;
+
+  --color-earth-50: #faf7f2;
+  --color-earth-100: #f4ede0;
+  --color-earth-200: #e8d9c1;
+  --color-earth-300: #d9bf9a;
+  --color-earth-400: #c8a173;
+  --color-earth-500: #b8875a;
+  --color-earth-600: #a7704a;
+  --color-earth-700: #8a5a3e;
+  --color-earth-800: #714a37;
+  --color-earth-900: #5d3e30;
+
+  --color-green-50: #f0f9f4;
+  --color-green-100: #dcf2e4;
+  --color-green-200: #bce4cc;
+  --color-green-300: #8fcfab;
+  --color-green-400: #5cb382;
+  --color-green-500: #389662;
+  --color-green-600: #2a7a50;
+  --color-green-700: #236242;
+  --color-green-800: #1f4f37;
+  --color-green-900: #1a422f;
+
+  --font-family-sans: var(--font-inter), system-ui, sans-serif;
+  --font-family-serif: var(--font-playfair), serif;
+}
+
+@layer base {
+  :root {
+    --font-inter: 'Inter', system-ui, sans-serif;
+    --font-playfair: 'Playfair Display', serif;
+  }
+
+  body {
+    @apply bg-earth-50 text-earth-900 antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
