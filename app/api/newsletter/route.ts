@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create transporter
+    // Create transporter (uses Gmail account from env for authentication)
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -36,8 +36,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Email to business (notification)
+    // Sent via Gmail account but appears from info@kosinaturals.com
     const businessMailOptions = {
-      from: `Kosi Naturals <info@kosinaturals.com>`,
+      from: `"Kosi Naturals" <info@kosinaturals.com>`,
       replyTo: 'info@kosinaturals.com',
       to: businessEmail,
       subject: `New Newsletter Subscription: ${email}`,
@@ -61,8 +62,9 @@ export async function POST(request: NextRequest) {
     };
 
     // Email to user (welcome/confirmation)
+    // Sent via Gmail account but appears from info@kosinaturals.com
     const userMailOptions = {
-      from: `Kosi Naturals <info@kosinaturals.com>`,
+      from: `"Kosi Naturals" <info@kosinaturals.com>`,
       replyTo: 'info@kosinaturals.com',
       to: email,
       subject: `Welcome to Kosi Naturals Newsletter!`,
